@@ -7,21 +7,22 @@ import { ShoppingCart, User, Search, ChevronDown, X, Phone, Mail, Lock } from "l
 import { useCartStore } from "@/lib/store";
 import { CATEGORIES, PRODUCTS } from "@/lib/products";
 
-export function Header({ activeCategory, onCategoryChange, searchQuery, onSearchChange }: {
-  activeCategory: string;
-  onCategoryChange: (cat: string) => void;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
+export function Header({ activeCategory, onCategoryChange, searchQuery = "", onSearchChange = () => {} }: {
+  activeCategory?: string;
+  onCategoryChange?: (cat: string) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }) {
   const [scrolled, setScrolled] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { openCart, totalItems } = useCartStore();
 
-  const suggestions = searchQuery.length > 0
+  const safeQuery = searchQuery ?? "";
+  const suggestions = safeQuery.length > 0
     ? PRODUCTS.filter(p => 
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.brand.toLowerCase().includes(searchQuery.toLowerCase())
+        p.name.toLowerCase().includes(safeQuery.toLowerCase()) ||
+        p.brand.toLowerCase().includes(safeQuery.toLowerCase())
       ).slice(0, 6)
     : [];
 
@@ -172,7 +173,7 @@ export function Header({ activeCategory, onCategoryChange, searchQuery, onSearch
             <input
               type="text"
               placeholder="Search for rice, dal, oil, spices..."
-              value={searchQuery}
+              value={safeQuery}
               onChange={(e) => {
                 onSearchChange(e.target.value);
                 setShowSuggestions(true);
