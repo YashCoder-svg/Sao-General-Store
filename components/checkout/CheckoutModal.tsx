@@ -39,6 +39,7 @@ export function CheckoutModal() {
   const [orderId, setOrderId] = useState("");
   const [selectedPayment, setSelectedPayment] = useState("upi");
   const [selectedSlot, setSelectedSlot] = useState(DELIVERY_SLOTS[0]);
+  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState<CheckoutForm>({
     firstName: "", lastName: "", mobile: "",
     address: "", city: "Raigarh", pincode: "496001",
@@ -622,12 +623,14 @@ export function CheckoutModal() {
               onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1.02)"; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
             >
-              {step === 1
+              {isLoading ? (
+                <Loader2 size={18} style={{ animation: "spin 1s linear infinite" }} />
+              ) : step === 1
                 ? "Continue to Delivery"
                 : step === 2
                 ? "Continue to Payment"
                 : `Pay ₹${total}`}
-              <ChevronRight size={16} />
+              {!isLoading && <ChevronRight size={16} />}
             </button>
           </div>
         )}
