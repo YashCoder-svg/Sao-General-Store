@@ -12,15 +12,8 @@ export function getProductImage(product: ProductImageProduct): string {
   // Priority 1: admin-uploaded custom image
   if (product.customImage?.trim()) return product.customImage.trim();
 
-  // Priority 2: productImages mapping (case-insensitive & dash-normalized)
-  const normalizedSearch = product.name.toLowerCase().replace(/[\u2013\u2014]/g, "-").trim();
-  
-  const key = Object.keys(productImages).find((k) => {
-    const normalizedKey = k.toLowerCase().replace(/[\u2013\u2014]/g, "-").trim();
-    return normalizedKey === normalizedSearch;
-  });
-  
-  if (key) return productImages[key];
+  // Priority 2: productImages mapping
+  if (productImages[product.name]) return productImages[product.name];
 
   // Priority 3: pre-verified Open Food Facts URL
   if (product.offImageUrl?.trim()) return product.offImageUrl.trim();

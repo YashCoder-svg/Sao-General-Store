@@ -1,4 +1,4 @@
-﻿// lib/products.ts — Complete product catalog with verified images & daily-use essentials
+// lib/products.ts — Complete product catalog with verified images & daily-use essentials
 
 import { getProductImage as resolveProductImage } from "@/lib/getProductImage";
 import { getProductImageByName } from "@/lib/productImages";
@@ -55,6 +55,7 @@ export const PRODUCTS: Product[] = [
     size: "26 kg",
     deliveryTime: "30 min",
     image: getProductImageByName("Kalyani Premium Sona Masoori"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/404/550/0033/front_en.3.400.jpg",
     badge: "Best Seller",
     rating: 4.8,
     reviews: 2341,
@@ -119,8 +120,8 @@ export const PRODUCTS: Product[] = [
     mrp: 65,
     size: "1 kg",
     deliveryTime: "30 min",
-    // Photo: white flour
     image: getProductImageByName("Pillsbury Maida"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/126/701/2401/front_en.3.400.jpg",
     rating: 4.4,
     reviews: 3201,
     inStock: true,
@@ -134,8 +135,8 @@ export const PRODUCTS: Product[] = [
     mrp: 89,
     size: "1 kg",
     deliveryTime: "30 min",
-    // Photo: chickpea / gram flour yellow
     image: getProductImageByName("Besan (Gram Flour)"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/103/075/6130/front_en.3.400.jpg",
     badge: "New",
     rating: 4.5,
     reviews: 1204,
@@ -218,6 +219,7 @@ export const PRODUCTS: Product[] = [
     size: "500 g",
     deliveryTime: "30 min",
     image: getProductImageByName("Rajma (Kidney Beans)"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/605/007/0082/front_en.3.400.jpg",
     badge: "Organic",
     rating: 4.5,
     reviews: 543,
@@ -302,6 +304,7 @@ export const PRODUCTS: Product[] = [
     size: "500 mL",
     deliveryTime: "30 min",
     image: getProductImageByName("Parachute Coconut Oil"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/103/001/2913/front_en.3.400.jpg",
     badge: "Best Seller",
     rating: 4.6,
     reviews: 4320,
@@ -335,8 +338,9 @@ export const PRODUCTS: Product[] = [
     mrp: 65,
     size: "100 g",
     deliveryTime: "30 min",
-    // Photo: spice mix / masala powder
     image: getProductImageByName("MDH Chana Masala"),
+    barcode: "8901058000106",
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/105/800/0106/front_en.3.400.jpg",
     badge: "Best Seller",
     rating: 4.7,
     reviews: 6201,
@@ -400,8 +404,8 @@ export const PRODUCTS: Product[] = [
     mrp: 45,
     size: "200 g",
     deliveryTime: "30 min",
-    // Photo: bright yellow turmeric
     image: getProductImageByName("Turmeric Powder (Haldi)"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/199/801/1049/front_en.3.400.jpg",
     badge: "Organic",
     rating: 4.5,
     reviews: 3821,
@@ -416,8 +420,8 @@ export const PRODUCTS: Product[] = [
     mrp: 51,
     size: "200 g",
     deliveryTime: "30 min",
-    // Photo: red chili powder
     image: getProductImageByName("Red Chilli Powder"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/403/000/0012/front_en.3.400.jpg",
     rating: 4.4,
     reviews: 2905,
     inStock: true,
@@ -431,8 +435,8 @@ export const PRODUCTS: Product[] = [
     mrp: 42,
     size: "100 g",
     deliveryTime: "30 min",
-    // Photo: green coriander spice
     image: getProductImageByName("Coriander Powder (Dhania)"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/105/800/0113/front_en.3.400.jpg",
     rating: 4.3,
     reviews: 1823,
     inStock: true,
@@ -446,8 +450,8 @@ export const PRODUCTS: Product[] = [
     mrp: 78,
     size: "100 g",
     deliveryTime: "30 min",
-    // Photo: cumin seeds dark brown
     image: getProductImageByName("Cumin Seeds (Jeera)"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/199/801/1056/front_en.3.400.jpg",
     badge: "New",
     rating: 4.5,
     reviews: 1102,
@@ -626,7 +630,6 @@ export const PRODUCTS: Product[] = [
   },
 
   // ─── Beverages ────────────────────────────────────────────────────────────
-
   {
     id: "bev-1",
     name: "BRU Super Strong Coffee",
@@ -703,6 +706,7 @@ export const PRODUCTS: Product[] = [
     size: "1 L",
     deliveryTime: "30 min",
     image: getProductImageByName("Real Fruit Juice – Mango"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/120/700/0352/front_en.3.400.jpg",
     badge: "New",
     rating: 4.3,
     reviews: 1823,
@@ -853,6 +857,7 @@ export const PRODUCTS: Product[] = [
     size: "10 pcs",
     deliveryTime: "30 min",
     image: getProductImageByName("Good Knight Mosquito Coil"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/139/611/1145/front_en.3.400.jpg",
     badge: "Popular",
     rating: 4.3,
     reviews: 2210,
@@ -868,6 +873,7 @@ export const PRODUCTS: Product[] = [
     size: "3 pcs",
     deliveryTime: "30 min",
     image: getProductImageByName("Scotch-Brite Scrub Pad"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/103/075/6000/front_en.3.400.jpg",
     rating: 4.5,
     reviews: 4102,
     inStock: true,
@@ -1017,8 +1023,8 @@ export const PRODUCTS: Product[] = [
     mrp: 99,
     size: "15 pcs",
     deliveryTime: "30 min",
-    // Photo: feminine care / hygiene product
     image: getProductImageByName("Whisper Ultra Pads"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/139/601/3207/front_en.3.400.jpg",
     badge: "Popular",
     rating: 4.6,
     reviews: 7820,
@@ -1033,8 +1039,8 @@ export const PRODUCTS: Product[] = [
     mrp: 249,
     size: "1 pc",
     deliveryTime: "30 min",
-    // Photo: razor shaving grooming
     image: getProductImageByName("Gillette Mach3 Razor"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/131/400/5872/front_en.3.400.jpg",
     rating: 4.5,
     reviews: 4102,
     inStock: true,
@@ -1049,6 +1055,7 @@ export const PRODUCTS: Product[] = [
     size: "250 mL",
     deliveryTime: "30 min",
     image: getProductImageByName("Vaseline Petroleum Jelly"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/103/074/3291/front_en.3.400.jpg",
     badge: "Best Seller",
     rating: 4.7,
     reviews: 8901,
@@ -1150,8 +1157,8 @@ export const PRODUCTS: Product[] = [
     mrp: 99,
     size: "12 pcs",
     deliveryTime: "By 7AM",
-    // Photo: brown eggs basket / tray
     image: getProductImageByName("Farm Fresh Eggs"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/106/301/2104/front_en.3.400.jpg",
     badge: "Fresh Today",
     rating: 4.5,
     reviews: 6012,
@@ -1234,8 +1241,8 @@ export const PRODUCTS: Product[] = [
     mrp: 75,
     size: "90 g",
     deliveryTime: "By 7AM",
-    // Photo: yogurt white creamy bowl
     image: getProductImageByName("Epigamia Greek Yogurt"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/106/300/1740/front_en.3.400.jpg",
     badge: "New",
     rating: 4.4,
     reviews: 2301,
@@ -1252,8 +1259,8 @@ export const PRODUCTS: Product[] = [
     mrp: 50,
     size: "400 g",
     deliveryTime: "30 min",
-    // Photo: sliced white bread loaf
     image: getProductImageByName("Harvest Gold Bread"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/106/301/2104/front_en.3.400.jpg",
     badge: "Fresh Today",
     rating: 4.4,
     reviews: 8901,
@@ -1268,8 +1275,8 @@ export const PRODUCTS: Product[] = [
     mrp: 55,
     size: "400 g",
     deliveryTime: "30 min",
-    // Photo: brown whole wheat bread
     image: getProductImageByName("Britannia Brown Bread"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/106/371/0126/front_en.3.400.jpg",
     badge: "Popular",
     rating: 4.5,
     reviews: 6730,
@@ -1284,8 +1291,8 @@ export const PRODUCTS: Product[] = [
     mrp: 50,
     size: "60 g",
     deliveryTime: "30 min",
-    // Photo: golden croissant on plate
     image: getProductImageByName("Cream Croissant"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/103/080/4533/front_en.3.400.jpg",
     badge: "New",
     rating: 4.3,
     reviews: 1204,
@@ -1319,8 +1326,8 @@ export const PRODUCTS: Product[] = [
     mrp: 55,
     size: "1 kg",
     deliveryTime: "30 min",
-    // Photo: white granulated sugar
     image: getProductImageByName("Uttam Sugar"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/601/100/0002/front_en.3.400.jpg",
     badge: "Popular",
     rating: 4.4,
     reviews: 3801,
@@ -1335,8 +1342,8 @@ export const PRODUCTS: Product[] = [
     mrp: 105,
     size: "200 g",
     deliveryTime: "30 min",
-    // Photo: fruit jam red jar
     image: getProductImageByName("Kissan Mixed Fruit Jam"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/106/305/1040/front_en.3.400.jpg",
     badge: "Popular",
     rating: 4.5,
     reviews: 4210,
@@ -1351,8 +1358,9 @@ export const PRODUCTS: Product[] = [
     mrp: 180,
     size: "250 g",
     deliveryTime: "30 min",
-    // Photo: golden honey jar drizzle
     image: getProductImageByName("Dabur Honey"),
+    barcode: "8901207000352",
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/120/700/0352/front_en.11.400.jpg",
     badge: "Best Seller",
     rating: 4.7,
     reviews: 9801,
@@ -1367,8 +1375,8 @@ export const PRODUCTS: Product[] = [
     mrp: 145,
     size: "450 g",
     deliveryTime: "30 min",
-    // Photo: ketchup bottle red tomato sauce
     image: getProductImageByName("Heinz Tomato Ketchup"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/103/075/6000/front_en.3.400.jpg",
     rating: 4.5,
     reviews: 6320,
     inStock: true,
@@ -1401,8 +1409,8 @@ export const PRODUCTS: Product[] = [
     mrp: 89,
     size: "500 g",
     deliveryTime: "30 min",
-    // Photo: millet grains small round
     image: getProductImageByName("Foxtail Millet"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/605/007/0013/front_en.3.400.jpg",
     rating: 4.4,
     reviews: 934,
     inStock: true,
@@ -1450,8 +1458,8 @@ export const PRODUCTS: Product[] = [
     mrp: 110,
     size: "1 kg",
     deliveryTime: "30 min",
-    // Photo: dark brown millet flour grain
     image: getProductImageByName("Ragi (Finger Millet) Flour"),
+    offImageUrl: "https://images.openfoodfacts.org/images/products/890/605/007/0013/front_en.3.400.jpg",
     badge: "Organic",
     rating: 4.5,
     reviews: 2103,

@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart, User, Search, ChevronDown, X, Phone, Mail, Lock } from "lucide-react";
+import { ShoppingCart, User, Search, ChevronDown, X, Phone, Mail, Lock, LogOut } from "lucide-react";
 import { useCartStore } from "@/lib/store";
+import { useAuth } from "@/lib/authContext";
 import { CATEGORIES, PRODUCTS } from "@/lib/products";
 
 export function Header({ activeCategory, onCategoryChange, searchQuery = "", onSearchChange = () => {} }: {
@@ -17,6 +18,7 @@ export function Header({ activeCategory, onCategoryChange, searchQuery = "", onS
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { openCart, totalItems } = useCartStore();
+  const { currentUser, logout, loading } = useAuth();
 
   const safeQuery = searchQuery ?? "";
   const suggestions = safeQuery.length > 0
@@ -306,38 +308,89 @@ export function Header({ activeCategory, onCategoryChange, searchQuery = "", onS
             <span className="hidden lg:inline">Help</span>
           </a>
 
-          <Link
-            href="/login"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "7px",
-              padding: "8px 16px",
-              border: "1.5px solid #E8E4DC",
-              borderRadius: "12px",
-              background: "white",
-              cursor: "pointer",
-              fontFamily: "Satoshi, sans-serif",
-              fontWeight: 600,
-              fontSize: "13.5px",
-              color: "#1a1a1a",
-              transition: "all 0.2s",
-              textDecoration: "none"
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.borderColor = "#2D6A4F";
-              el.style.color = "#2D6A4F";
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLElement;
-              el.style.borderColor = "#E8E4DC";
-              el.style.color = "#1a1a1a";
-            }}
-          >
-            <User size={15} />
-            <span className="hidden md:inline">Sign In</span>
-          </Link>
+          {loading || !mounted ? (
+            <div style={{ width: "90px", height: "36px", background: "#f3f4f6", borderRadius: "12px", animate: "pulse 1.5s infinite" }} />
+          ) : currentUser ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "7px",
+                  padding: "8px 16px",
+                  border: "1.5px solid #2D6A4F",
+                  borderRadius: "12px",
+                  background: "rgba(45, 106, 79, 0.05)",
+                  fontFamily: "Satoshi, sans-serif",
+                  fontWeight: 700,
+                  fontSize: "13.5px",
+                  color: "#2D6A4F",
+                }}
+              >
+                <User size={15} />
+                <span>{currentUser.displayName}</span>
+              </div>
+              <button
+                onClick={logout}
+                title="Logout"
+                style={{
+                  background: "none",
+                  border: "1.5px solid #ff4d4d",
+                  borderRadius: "12px",
+                  padding: "8px",
+                  cursor: "pointer",
+                  color: "#ff4d4d",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#ff4d4d";
+                  e.currentTarget.style.color = "white";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "none";
+                  e.currentTarget.style.color = "#ff4d4d";
+                }}
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "7px",
+                padding: "8px 16px",
+                border: "1.5px solid #E8E4DC",
+                borderRadius: "12px",
+                background: "white",
+                cursor: "pointer",
+                fontFamily: "Satoshi, sans-serif",
+                fontWeight: 600,
+                fontSize: "13.5px",
+                color: "#1a1a1a",
+                transition: "all 0.2s",
+                textDecoration: "none"
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = "#2D6A4F";
+                el.style.color = "#2D6A4F";
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.style.borderColor = "#E8E4DC";
+                el.style.color = "#1a1a1a";
+              }}
+            >
+              <User size={15} />
+              <span className="hidden md:inline">Sign In</span>
+            </Link>
+          )}
 
           {/* Cart button */}
           <button

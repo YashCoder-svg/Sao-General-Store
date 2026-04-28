@@ -44,12 +44,16 @@ export default function LoginPage() {
   }, [step, timer]);
 
   const setupRecaptcha = () => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-        'callback': () => {}
-      });
+    // Always clear the old verifier — reusing a stale one after a re-render
+    // causes "reCAPTCHA client element has been removed" errors.
+    if (window.recaptchaVerifier) {
+      try { window.recaptchaVerifier.clear(); } catch (_) {}
+      window.recaptchaVerifier = null as any;
     }
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      size: 'invisible',
+      callback: () => {},
+    });
   };
 
   const handleSendOTP = async (e: React.FormEvent) => {
@@ -70,7 +74,12 @@ export default function LoginPage() {
       setTimer(30);
     } catch (error: any) {
       console.error("Error:", error);
-      alert(error.message || "Failed to send OTP.");
+      // Reset verifier so the next attempt starts fresh
+      if (window.recaptchaVerifier) {
+        try { window.recaptchaVerifier.clear(); } catch (_) {}
+        window.recaptchaVerifier = null as any;
+      }
+      alert(error.message || "Failed to send OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -81,9 +90,24 @@ export default function LoginPage() {
     if (!confirmationResult) return;
     setIsLoading(true);
     try {
-      await confirmationResult.confirm(otp);
+      const result = await confirmationResult.confirm(otp);
+      
+      // Try to sync the name from localStorage to the Firebase Profile
+      const phone = result.user.phoneNumber || "";
+      const savedName = localStorage.getItem(`name_${phone}`);
+      if (savedName && !result.user.displayName) {
+        try {
+          const { updateProfile } = await import("firebase/auth");
+          await updateProfile(result.user, { displayName: savedName });
+        } catch (err) {
+          console.error("Failed to update profile name:", err);
+        }
+      }
+
       alert("User Login successful!");
       router.push("/");
+      // Force reload to ensure everything is fresh
+      setTimeout(() => window.location.reload(), 500);
     } catch (error: any) {
       alert("Invalid OTP.");
     } finally {
@@ -97,8 +121,11 @@ export default function LoginPage() {
     // Simulate admin login
     await new Promise((resolve) => setTimeout(resolve, 1500));
     if (email === "admin@kirana.com" && password === "admin123") {
+      localStorage.setItem("kirana_admin_session", "true");
       alert("Admin Login successful!");
       router.push("/admin");
+      // Use reload to ensure AuthContext picks up the new localStorage value immediately
+      setTimeout(() => window.location.reload(), 500);
     } else {
       alert("Invalid Admin credentials. (Use admin@kirana.com / admin123)");
     }

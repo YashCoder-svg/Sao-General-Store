@@ -7,15 +7,22 @@ import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({ name: "", phone: "", email: "" });
   const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate registration
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    
+    // Save name to localStorage for the AuthContext to pick up after login
+    const formattedPhone = `+91${formData.phone}`;
+    localStorage.setItem(`name_${formattedPhone}`, formData.name);
+    
+    // Simulate registration delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    
     setIsLoading(false);
-    alert("Registration successful! Please login to continue.");
+    alert(`Registration successful for ${formData.name}! Please login with your phone number.`);
     router.push("/login");
   };
 
@@ -87,6 +94,8 @@ export default function RegisterPage() {
               <input
                 type="text"
                 required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Enter your name"
                 style={{
                   width: "100%",
@@ -107,6 +116,8 @@ export default function RegisterPage() {
               <input
                 type="tel"
                 required
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "") })}
                 placeholder="10 digit mobile number"
                 style={{
                   width: "100%",
@@ -126,6 +137,8 @@ export default function RegisterPage() {
               <Mail size={18} style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "#9ca3af" }} />
               <input
                 type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="name@example.com"
                 style={{
                   width: "100%",
