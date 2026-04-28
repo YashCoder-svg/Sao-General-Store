@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { X, Check, ChevronRight, MapPin, CreditCard, Smartphone, Building2, Banknote, QrCode, Loader2 } from "lucide-react";
-import { getProductImage } from "@/lib/getProductImage";
 import { useCartStore } from "@/lib/store";
 
 type Step = 1 | 2 | 3 | 4;
@@ -236,14 +235,14 @@ export function CheckoutModal() {
                     }}
                   >
                     <div style={{ width: "48px", height: "48px", borderRadius: "8px", overflow: "hidden", position: "relative", flexShrink: 0 }}>
-                      <Image src={getProductImage(item)} alt={item.name} fill unoptimized style={{ objectFit: "contain" }} />
+                      <Image src={item.image} alt={item.name} fill unoptimized style={{ objectFit: "contain" }} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <p style={{ fontSize: "13.5px", fontWeight: 700, fontFamily: "Satoshi, sans-serif" }}>
                         {item.name}
                       </p>
                       <p style={{ fontSize: "12px", color: "#6b7280", fontFamily: "Satoshi, sans-serif" }}>
-                        {item.size} × {item.quantity}
+                        {item.weight} × {item.quantity}
                       </p>
                     </div>
                     <span style={{ fontFamily: "Cabinet Grotesk, sans-serif", fontWeight: 800, fontSize: "15px" }}>

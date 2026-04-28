@@ -208,7 +208,7 @@ export function ProductCard({ product }: { product: Product }) {
               borderRadius: "6px",
             }}
           >
-            {product.size}
+            {product.weight}
           </span>
           <span
             style={{
@@ -222,7 +222,7 @@ export function ProductCard({ product }: { product: Product }) {
             }}
           >
             <Clock size={11} />
-            {product.deliveryTime}
+            {product.delivery}
           </span>
         </div>
 
@@ -296,7 +296,7 @@ export function ProductCard({ product }: { product: Product }) {
 
           <button
             onClick={handleAddToCart}
-            disabled={!product.inStock}
+            disabled={product.inStock === false}
             style={{
               display: "flex",
               alignItems: "center",
@@ -309,10 +309,10 @@ export function ProductCard({ product }: { product: Product }) {
               fontFamily: "Satoshi, sans-serif",
               fontWeight: 700,
               fontSize: "12.5px",
-              cursor: product.inStock ? "pointer" : "not-allowed",
+              cursor: product.inStock !== false ? "pointer" : "not-allowed",
               transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
               transform: cartState === "added" ? "scale(1.08)" : "scale(1)",
-              opacity: !product.inStock ? 0.5 : 1,
+              opacity: product.inStock === false ? 0.5 : 1,
               whiteSpace: "nowrap",
               zIndex: 2,
               position: "relative",
@@ -334,7 +334,7 @@ export function ProductCard({ product }: { product: Product }) {
             ) : (
               <>
                 <ShoppingCart size={13} />
-                {product.inStock ? "Add" : "OOS"}
+                {product.inStock !== false ? "Add" : "OOS"}
               </>
             )}
           </button>

@@ -10,13 +10,9 @@ import {
 } from "lucide-react";
 import {
   Product,
-  getProductById,
   getDiscountPercent,
   PRODUCTS,
 } from "@/lib/products";
-import { getProductImage } from "@/lib/getProductImage";
-import { PRODUCT_PLACEHOLDER_IMAGE } from "@/lib/productImages";
-import { getProductImageFallbackLabel } from "@/lib/product-images";
 import { useCartStore } from "@/lib/store";
 import { useToast } from "@/components/ui/Toast";
 import { Ticker } from "@/components/ui/Ticker";
@@ -33,29 +29,7 @@ const BADGE_STYLES: Record<string, { bg: string; color: string }> = {
 };
 
 function ProductHeroImage({ product }: { product: Product }) {
-  const [imgSrc, setImgSrc] = useState(() => getProductImage(product));
   const [loaded, setLoaded] = useState(false);
-
-  const initial = getProductImageFallbackLabel(product.brand, product.name);
-
-  const handleError = () => {
-    console.log("❌ Detail image failed:", imgSrc);
-
-    if (imgSrc !== product.offImageUrl && product.offImageUrl) {
-      setImgSrc(product.offImageUrl);
-      return;
-    }
-    if (imgSrc !== product.image && product.image) {
-      setImgSrc(product.image);
-      return;
-    }
-    if (imgSrc !== PRODUCT_PLACEHOLDER_IMAGE) {
-      setImgSrc(PRODUCT_PLACEHOLDER_IMAGE);
-    }
-    setLoaded(true);
-  };
-
-  const isFailed = imgSrc === PRODUCT_PLACEHOLDER_IMAGE && loaded;
 
   return (
     <div
@@ -69,6 +43,7 @@ function ProductHeroImage({ product }: { product: Product }) {
         justifyContent: "center",
         padding: "24px",
         overflow: "hidden",
+        borderRadius: "24px",
       }}
     >
       {!loaded && (
@@ -80,51 +55,36 @@ function ProductHeroImage({ product }: { product: Product }) {
               "linear-gradient(90deg, #f5f5f5 25%, #ebebeb 50%, #f5f5f5 75%)",
             backgroundSize: "200% 100%",
             animation: "productShimmer 1.4s infinite linear",
+            zIndex: 1,
           }}
         />
       )}
 
-      {!isFailed ? (
-        <Image
-          src={imgSrc}
-          alt={product.name}
-          fill
-          sizes="(max-width: 768px) 90vw, 440px"
-          unoptimized
-          onLoad={() => setLoaded(true)}
-          onError={handleError}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            padding: "24px",
-            boxSizing: "border-box",
-            transition: "transform 0.5s ease",
-            opacity: loaded ? 1 : 0.85,
-          }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.transform = "scale(1.04)")}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.transform = "scale(1)")}
-        />
-      ) : (
-        <div
-          style={{
-            width: "120px",
-            height: "120px",
-            borderRadius: "50%",
-            background: "#F0FDF4",
-            border: "2px solid #BBF7D0",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "44px",
-            fontWeight: 800,
-            color: "#16A34A",
-            fontFamily: "sans-serif",
-          }}
-        >
-          {initial}
-        </div>
-      )}
+      <Image
+        src={product.image || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80"}
+        alt={product.name}
+        fill
+        sizes="(max-width: 768px) 90vw, 440px"
+        unoptimized
+        loading="eager"
+        onLoad={() => setLoaded(true)}
+        onError={(e) => {
+          const img = e.currentTarget as HTMLImageElement;
+          img.src = "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80";
+        }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          padding: "24px",
+          boxSizing: "border-box",
+          transition: "all 0.5s ease",
+          opacity: loaded ? 1 : 0,
+          zIndex: 2,
+        }}
+        onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.transform = "scale(1.04)")}
+        onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.transform = "scale(1)")}
+      />
 
       <style>{`
         @keyframes productShimmer {
@@ -138,7 +98,7 @@ function ProductHeroImage({ product }: { product: Product }) {
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const product = getProductById(id);
+  const product = PRODUCTS.find((p) => p.id === id);
   if (!product) notFound();
 
   const [qty, setQty] = useState(1);
@@ -315,7 +275,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   fontWeight: 600, fontFamily: "Satoshi, sans-serif",
                   padding: "6px 14px", borderRadius: "8px",
                 }}>
-                  📦 {product.size}
+                  📦 {product.weight}
                 </span>
                 <span style={{
                   background: "#D8F3DC", color: "#2D6A4F", fontSize: "13px",
@@ -323,7 +283,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   padding: "6px 14px", borderRadius: "8px",
                   display: "flex", alignItems: "center", gap: "5px",
                 }}>
-                  <Clock size={13} /> {product.deliveryTime} delivery
+                  <Clock size={13} /> {product.delivery} delivery
                 </span>
               </div>
 

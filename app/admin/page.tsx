@@ -8,8 +8,6 @@ import {
   Edit, Eye, EyeOff, Star
 } from "lucide-react";
 import { PRODUCTS, CATEGORIES, Product } from "@/lib/products";
-import { getProductImage } from "@/lib/getProductImage";
-import { getProductImageFallbackLabel } from "@/lib/product-images";
 
 type OrderStatus = "Pending" | "Confirmed" | "Delivered" | "Cancelled";
 
@@ -29,8 +27,8 @@ const STATUS_STYLES: Record<OrderStatus, { bg: string; color: string; icon: type
 };
 
 const EMPTY_PRODUCT = {
-  name: "", brand: "", category: "rice-grains", price: "", mrp: "",
-  size: "", customImage: "", offImageUrl: "", barcode: "", badge: "", deliveryTime: "30 min",
+  name: "", brand: "", category: "atta-rice-dal", price: "", mrp: "",
+  weight: "", image: "", badge: "", delivery: "30 min",
 };
 
 type Tab = "dashboard" | "products" | "orders";
@@ -38,15 +36,11 @@ type Tab = "dashboard" | "products" | "orders";
 function ProductImagePreview({
   src,
   alt,
-  brand,
 }: {
   src: string;
   alt: string;
-  brand: string;
 }) {
   const [failed, setFailed] = useState(!src);
-
-  const initial = getProductImageFallbackLabel(brand, alt);
 
   return (
     <div
@@ -73,24 +67,7 @@ function ProductImagePreview({
           onError={() => setFailed(true)}
         />
       ) : (
-        <div
-          style={{
-            width: "56px",
-            height: "56px",
-            borderRadius: "50%",
-            background: "#F0FDF4",
-            border: "2px solid #BBF7D0",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "22px",
-            fontWeight: 800,
-            color: "#16A34A",
-            fontFamily: "sans-serif",
-          }}
-        >
-          {initial}
-        </div>
+        <div style={{ fontSize: "24px" }}>🛒</div>
       )}
     </div>
   );
@@ -103,25 +80,18 @@ export default function AdminPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newProduct, setNewProduct] = useState(EMPTY_PRODUCT);
   const [formError, setFormError] = useState("");
-  const hasPreviewInput = Boolean(
-    newProduct.name ||
-      newProduct.brand ||
-      newProduct.customImage ||
-      newProduct.offImageUrl ||
-      newProduct.barcode,
-  );
-  const previewImage = hasPreviewInput ? getProductImage(newProduct) : "";
+  const hasPreviewInput = Boolean(newProduct.image);
+  const previewImage = newProduct.image;
 
   const todayRevenue = MOCK_ORDERS.filter(o => o.status !== "Cancelled").reduce((a, o) => a + o.total, 0);
   const pendingCount = MOCK_ORDERS.filter(o => o.status === "Pending").length;
-  const lowStock = products.filter(p => !p.inStock).length;
+  const lowStock = products.filter(p => p.inStock === false).length;
 
   const handleAddProduct = () => {
-    if (!newProduct.name || !newProduct.price || !newProduct.brand) {
-      setFormError("Name, Brand and Price are required.");
+    if (!newProduct.name || !newProduct.price || !newProduct.brand || !newProduct.image) {
+      setFormError("Name, Brand, Price and Image URL are required.");
       return;
     }
-    const resolvedImage = getProductImage(newProduct);
     const p: Product = {
       id: "new-" + Date.now(),
       name: newProduct.name,
@@ -129,12 +99,9 @@ export default function AdminPage() {
       category: newProduct.category,
       price: Number(newProduct.price),
       mrp: Number(newProduct.mrp) || Number(newProduct.price),
-      size: newProduct.size || "1 unit",
-      deliveryTime: newProduct.deliveryTime,
-      image: resolvedImage,
-      customImage: newProduct.customImage || undefined,
-      offImageUrl: newProduct.offImageUrl || undefined,
-      barcode: newProduct.barcode || undefined,
+      weight: newProduct.weight || "1 unit",
+      delivery: newProduct.delivery,
+      image: newProduct.image,
       badge: (newProduct.badge as Product["badge"]) || undefined,
       rating: 4.5,
       reviews: 0,
@@ -327,7 +294,8 @@ export default function AdminPage() {
                       { key: "brand", label: "Brand *", placeholder: "e.g. Tata", type: "text" },
                       { key: "price", label: "Price (₹) *", placeholder: "99", type: "number" },
                       { key: "mrp", label: "MRP (₹)", placeholder: "115", type: "number" },
-                      { key: "size", label: "Size / Quantity", placeholder: "1 kg", type: "text" },
+                      { key: "weight", label: "Weight / Size", placeholder: "1 kg", type: "text" },
+                      { key: "image", label: "Image URL *", placeholder: "https://...", type: "text" },
                     ] as const).map(({ key, label, placeholder, type }) => (
                       <div key={key}>
                         <label style={labelStyle}>{label}</label>
@@ -341,63 +309,22 @@ export default function AdminPage() {
                       </div>
                     ))}
 
-                    {/* ── Image Fields (3-tier priority) ── */}
-                    <div style={{ gridColumn: "1 / -1" }}>
-                      <p style={{ fontSize: "12px", fontWeight: 700, color: "#256FEF", fontFamily: "Satoshi, sans-serif", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "0.07em" }}>
-                        📸 Image (priority: Custom → OFF URL → Barcode)
-                      </p>
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "12px" }}>
+                    {/* Live image preview */}
+                    {previewImage && (
+                      <div style={{ gridColumn: "1 / -1", display: "flex", gap: "12px", alignItems: "center", marginTop: "4px", padding: "12px", background: "#F9FAFB", borderRadius: "10px", border: "1px solid #E8E4DC" }}>
+                        <ProductImagePreview
+                          key={previewImage}
+                          src={previewImage}
+                          alt={newProduct.name || "Preview"}
+                        />
                         <div>
-                          <label style={labelStyle}>Custom Image URL (Cloudinary)</label>
-                          <input
-                            type="text"
-                            value={newProduct.customImage}
-                            onChange={e => setNewProduct(p => ({ ...p, customImage: e.target.value }))}
-                            placeholder="https://res.cloudinary.com/..."
-                            style={inputStyle}
-                          />
-                        </div>
-                        <div>
-                          <label style={labelStyle}>Open Food Facts Image URL</label>
-                          <input
-                            type="text"
-                            value={newProduct.offImageUrl}
-                            onChange={e => setNewProduct(p => ({ ...p, offImageUrl: e.target.value }))}
-                            placeholder="https://images.openfoodfacts.org/..."
-                            style={inputStyle}
-                          />
-                        </div>
-                        <div>
-                          <label style={labelStyle}>Barcode (EAN-13)</label>
-                          <input
-                            type="text"
-                            value={newProduct.barcode}
-                            onChange={e => setNewProduct(p => ({ ...p, barcode: e.target.value }))}
-                            placeholder="e.g. 8901063000101"
-                            style={inputStyle}
-                            maxLength={13}
-                          />
+                          <p style={{ fontSize: "12px", fontWeight: 700, color: "#2D6A4F", fontFamily: "Satoshi, sans-serif" }}>✓ Image Preview</p>
+                          <p style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "2px", fontFamily: "Satoshi, sans-serif" }}>
+                            Direct Image URL
+                          </p>
                         </div>
                       </div>
-
-                      {/* Live image preview */}
-                      {previewImage && (
-                        <div style={{ display: "flex", gap: "12px", alignItems: "center", marginTop: "12px", padding: "12px", background: "#F9FAFB", borderRadius: "10px", border: "1px solid #E8E4DC" }}>
-                          <ProductImagePreview
-                            key={previewImage}
-                            src={previewImage}
-                            alt={newProduct.name || "Preview"}
-                            brand={newProduct.brand}
-                          />
-                          <div>
-                            <p style={{ fontSize: "12px", fontWeight: 700, color: "#2D6A4F", fontFamily: "Satoshi, sans-serif" }}>✓ Image Preview</p>
-                            <p style={{ fontSize: "11px", color: "#9CA3AF", marginTop: "2px", fontFamily: "Satoshi, sans-serif" }}>
-                              Using: {newProduct.customImage ? "Custom (Cloudinary)" : newProduct.offImageUrl ? "Open Food Facts URL" : "Barcode direct URL"}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    )}
 
                     <div>
                       <label style={labelStyle}>Category</label>
@@ -429,8 +356,8 @@ export default function AdminPage() {
                     <div>
                       <label style={labelStyle}>Delivery Time</label>
                       <select
-                        value={newProduct.deliveryTime}
-                        onChange={e => setNewProduct(p => ({ ...p, deliveryTime: e.target.value }))}
+                        value={newProduct.delivery}
+                        onChange={e => setNewProduct(p => ({ ...p, delivery: e.target.value }))}
                         style={{ ...inputStyle }}
                       >
                         <option value="30 min">30 min</option>
@@ -481,7 +408,7 @@ export default function AdminPage() {
                         <td style={{ padding: "13px 16px" }}>
                           <div>
                             <p style={{ fontSize: "13.5px", fontWeight: 700, color: "#0a0a0a", marginBottom: "2px" }}>{p.name}</p>
-                            <p style={{ fontSize: "12px", color: "#9CA3AF" }}>{p.brand} · {p.size}</p>
+                            <p style={{ fontSize: "12px", color: "#9CA3AF" }}>{p.brand} · {p.weight}</p>
                           </div>
                         </td>
                         <td style={{ padding: "13px 16px" }}>

@@ -237,7 +237,7 @@ export function Header({ activeCategory, onCategoryChange, searchQuery = "", onS
                     </div>
                     <div>
                       <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>{p.name}</div>
-                      <div style={{ fontSize: "11px", color: "#6b7280" }}>{p.brand} • {p.size}</div>
+                      <div style={{ fontSize: "11px", color: "#6b7280" }}>{p.brand} • {p.weight}</div>
                     </div>
                   </div>
                 ))}

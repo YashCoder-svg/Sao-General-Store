@@ -3,7 +3,6 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { getProductImage } from "./getProductImage";
 import { Product } from "./products";
 
 export interface CartItem extends Product {
@@ -33,7 +32,6 @@ export const useCartStore = create<CartStore>()(
       wishlist: [],
 
       addItem: (product) => {
-        const cartProduct = { ...product, image: getProductImage(product) };
         const existing = get().items.find((i) => i.id === product.id);
         if (existing) {
           set((s) => ({
@@ -42,7 +40,7 @@ export const useCartStore = create<CartStore>()(
             ),
           }));
         } else {
-          set((s) => ({ items: [...s.items, { ...cartProduct, quantity: 1 }] }));
+          set((s) => ({ items: [...s.items, { ...product, quantity: 1 }] }));
         }
       },
 

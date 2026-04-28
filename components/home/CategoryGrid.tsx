@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { getCategoryImage } from "@/lib/getCategoryImage";
+import { CATEGORIES } from "@/lib/products";
 
 type DiscoverTile = {
   id: string;
@@ -130,6 +130,8 @@ const DISCOVERY_SECTIONS: DiscoverSection[] = [
     ],
   },
 ];
+
+import { getCategoryImage } from "@/lib/getCategoryImage";
 
 function CategoryCover({ tile }: { tile: DiscoverTile }) {
   return (

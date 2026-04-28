@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { X, Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
-import { getProductImage } from "@/lib/getProductImage";
 import { useCartStore } from "@/lib/store";
 
 export function CartDrawer() {
@@ -196,7 +195,7 @@ export function CartDrawer() {
                     }}
                   >
                     <Image
-                      src={getProductImage(item)}
+                      src={item.image}
                       alt={item.name}
                       fill
                       unoptimized
@@ -240,7 +239,7 @@ export function CartDrawer() {
                         marginBottom: "8px",
                       }}
                     >
-                      {item.size}
+                      {item.weight}
                     </p>
 
                     {/* Qty + price */}

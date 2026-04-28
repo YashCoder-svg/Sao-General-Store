@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { ProductCard } from "@/components/product/ProductCard";
-import { Product, getProductImage, PRODUCTS } from "@/lib/products";
+import { Product, PRODUCTS } from "@/lib/products";
 
 function SkeletonCard() {
   return (
@@ -51,17 +51,9 @@ export function ProductGrid({ category, searchQuery = "" }: { category: string, 
       }
 
       nextProducts = [...nextProducts].sort((a, b) => {
-        const aHasImage = Number(Boolean(getProductImage(a)));
-        const bHasImage = Number(Boolean(getProductImage(b)));
-
-        if (bHasImage !== aHasImage) {
-          return bHasImage - aHasImage;
-        }
-
         if (b.rating !== a.rating) {
           return b.rating - a.rating;
         }
-
         return a.name.localeCompare(b.name);
       });
 

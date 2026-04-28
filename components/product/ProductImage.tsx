@@ -2,8 +2,6 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { getProductImage } from "@/lib/getProductImage";
-import { PRODUCT_PLACEHOLDER_IMAGE } from "@/lib/productImages";
 import { Product } from "@/lib/products";
 
 interface ProductImageProps {
@@ -12,39 +10,11 @@ interface ProductImageProps {
 }
 
 export function ProductImage({ product, priority = false }: ProductImageProps) {
-  const [imgSrc, setImgSrc] = useState(
-    getProductImage(product) || PRODUCT_PLACEHOLDER_IMAGE
-  );
   const [loaded, setLoaded] = useState(false);
 
-  // Reset when product changes
-  useEffect(() => {
-    const newSrc = getProductImage(product) || PRODUCT_PLACEHOLDER_IMAGE;
-    setImgSrc(newSrc);
-    setLoaded(false);
-  }, [product]);
-
-  const handleError = () => {
-    console.log("❌ Image failed:", imgSrc);
-
-    // If current src is the mapped image, try offImageUrl directly
-    if (imgSrc !== product.offImageUrl && product.offImageUrl) {
-      setImgSrc(product.offImageUrl);
-      return;
-    }
-
-    // If current src is offImageUrl, try product.image
-    if (imgSrc !== product.image && product.image) {
-      setImgSrc(product.image);
-      return;
-    }
-
-    // Otherwise use placeholder
-    if (imgSrc !== PRODUCT_PLACEHOLDER_IMAGE) {
-      setImgSrc(PRODUCT_PLACEHOLDER_IMAGE);
-    }
-    setLoaded(true);
-  };
+  if (!product.image) {
+    console.warn("Missing image for product:", product.name);
+  }
 
   return (
     <div
@@ -71,26 +41,33 @@ export function ProductImage({ product, priority = false }: ProductImageProps) {
               "linear-gradient(90deg, #f5f5f5 25%, #ebebeb 50%, #f5f5f5 75%)",
             backgroundSize: "200% 100%",
             animation: "productShimmer 1.4s infinite linear",
+            zIndex: 1,
           }}
         />
       )}
 
       <Image
-        src={imgSrc || PRODUCT_PLACEHOLDER_IMAGE}
-        alt={product?.name || "Product"}
-        fill
-        sizes="(max-width: 768px) 45vw, 220px"
-        priority={priority}
+        src={product.image || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80"}
+        alt={product.name}
+        width={300}
+        height={300}
         unoptimized
-        onLoad={() => setLoaded(true)}
-        onError={handleError}
+        loading={priority ? "eager" : "lazy"}
+        className="object-cover"
         style={{
-          objectFit: "contain",
+          width: "100%",
+          height: "100%",
           padding: "12px",
           boxSizing: "border-box",
           display: "block",
-          opacity: loaded ? 1 : 0.85,
-          transition: "opacity 0.3s ease, transform 0.3s ease",
+          opacity: loaded ? 1 : 0,
+          transition: "opacity 0.4s ease, transform 0.4s ease",
+          zIndex: 2,
+        }}
+        onLoad={() => setLoaded(true)}
+        onError={(e) => {
+          const img = e.currentTarget as HTMLImageElement;
+          img.src = "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80";
         }}
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLElement).style.transform = "scale(1.05)";

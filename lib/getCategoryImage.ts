@@ -1,5 +1,3 @@
-// lib/getCategoryImage.ts
-
 import { categoryImages } from "./categoryImages";
 
 export function getCategoryImage(name: string): string {
@@ -7,5 +5,5 @@ export function getCategoryImage(name: string): string {
     (k) => k.toLowerCase() === name.toLowerCase()
   );
 
-  return key ? categoryImages[key] : "/placeholder.png";
+  return key ? categoryImages[key] : "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80";
 }
