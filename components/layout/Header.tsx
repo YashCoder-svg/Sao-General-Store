@@ -309,7 +309,7 @@ export function Header({ activeCategory, onCategoryChange, searchQuery = "", onS
           </a>
 
           {loading || !mounted ? (
-            <div style={{ width: "90px", height: "36px", background: "#f3f4f6", borderRadius: "12px", animate: "pulse 1.5s infinite" }} />
+            <div style={{ width: "90px", height: "36px", background: "#f3f4f6", borderRadius: "12px", animation: "pulse 1.5s infinite" }} />
           ) : currentUser ? (
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <div
