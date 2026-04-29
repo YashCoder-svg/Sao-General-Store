@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { X, Check, ChevronRight, MapPin, CreditCard, Smartphone, Building2, Banknote, QrCode, Loader2 } from "lucide-react";
 import { useCartStore } from "@/lib/store";
+import { getProductImageUrl } from "@/lib/productImageUrl";
+import { createStoreOrder, saveStoreOrder } from "@/lib/orders";
 
 type Step = 1 | 2 | 3 | 4;
 
@@ -68,10 +70,29 @@ export function CheckoutModal() {
     setTimeout(() => { if (step === 4) clearCart(); setStep(1); }, 300);
   };
 
-  const handlePlaceOrder = () => {
-    const id = "KM" + Math.floor(100000 + Math.random() * 900000);
+  const completeOrder = (existingId?: string) => {
+    const id = existingId || orderId || "KM" + Math.floor(100000 + Math.random() * 900000);
+    const customer = `${form.firstName} ${form.lastName}`.trim() || "Guest Customer";
+
+    saveStoreOrder(createStoreOrder({
+      id,
+      items,
+      total,
+      customer,
+      mobile: form.mobile,
+      address: form.address,
+      city: form.city,
+      pincode: form.pincode,
+      deliverySlot: selectedSlot,
+      paymentMethod: selectedPayment,
+    }));
+
     setOrderId(id);
     setStep(4);
+  };
+
+  const handlePlaceOrder = () => {
+    completeOrder();
   };
 
   const handleRazorpayPayment = () => {
@@ -79,7 +100,7 @@ export function CheckoutModal() {
     setOrderId(id);
 
     if (selectedPayment === "cod") {
-      setStep(4);
+      completeOrder(id);
       return;
     }
 
@@ -93,7 +114,7 @@ export function CheckoutModal() {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-      handlePlaceOrder();
+      completeOrder(id);
     }, 2000);
   };
 
@@ -235,7 +256,7 @@ export function CheckoutModal() {
                     }}
                   >
                     <div style={{ width: "48px", height: "48px", borderRadius: "8px", overflow: "hidden", position: "relative", flexShrink: 0 }}>
-                      <Image src={item.image} alt={item.name} fill unoptimized style={{ objectFit: "contain" }} />
+                      <Image src={getProductImageUrl(item)} alt={item.name} fill unoptimized style={{ objectFit: "contain" }} />
                     </div>
                     <div style={{ flex: 1 }}>
                       <p style={{ fontSize: "13.5px", fontWeight: 700, fontFamily: "Satoshi, sans-serif" }}>

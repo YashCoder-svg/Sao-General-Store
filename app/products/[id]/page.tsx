@@ -19,6 +19,7 @@ import { Ticker } from "@/components/ui/Ticker";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ProductCard } from "@/components/product/ProductCard";
+import { getProductImageUrl } from "@/lib/productImageUrl";
 
 const BADGE_STYLES: Record<string, { bg: string; color: string }> = {
   "Best Seller": { bg: "#DC2626", color: "white" },
@@ -30,6 +31,7 @@ const BADGE_STYLES: Record<string, { bg: string; color: string }> = {
 
 function ProductHeroImage({ product }: { product: Product }) {
   const [loaded, setLoaded] = useState(false);
+  const imageUrl = getProductImageUrl(product);
 
   return (
     <div
@@ -61,7 +63,7 @@ function ProductHeroImage({ product }: { product: Product }) {
       )}
 
       <Image
-        src={product.image || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80"}
+        src={imageUrl}
         alt={product.name}
         fill
         sizes="(max-width: 768px) 90vw, 440px"
@@ -70,7 +72,7 @@ function ProductHeroImage({ product }: { product: Product }) {
         onLoad={() => setLoaded(true)}
         onError={(e) => {
           const img = e.currentTarget as HTMLImageElement;
-          img.src = "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80";
+          img.src = `https://tse3.mm.bing.net/th?q=${encodeURIComponent(`${product.brand} ${product.name} product`)}&w=520&h=520&c=7&rs=1&p=0&o=5&pid=1.7`;
         }}
         style={{
           width: "100%",

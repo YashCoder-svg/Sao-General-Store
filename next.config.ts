@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "rukminim2.flixcart.com" },
       { protocol: "https", hostname: "www.bigbasket.com" },
       { protocol: "https", hostname: "www.bbassets.com" },
+      { protocol: "https", hostname: "tse3.mm.bing.net" },
+      { protocol: "https", hostname: "tse4.mm.bing.net" },
     ],
   },
 };

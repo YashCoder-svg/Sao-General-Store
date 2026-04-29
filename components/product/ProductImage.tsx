@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Product } from "@/lib/products";
+import { getProductImageUrl } from "@/lib/productImageUrl";
 
 interface ProductImageProps {
   product: Product;
@@ -11,6 +12,7 @@ interface ProductImageProps {
 
 export function ProductImage({ product, priority = false }: ProductImageProps) {
   const [loaded, setLoaded] = useState(false);
+  const imageUrl = getProductImageUrl(product);
 
   if (!product.image) {
     console.warn("Missing image for product:", product.name);
@@ -47,16 +49,16 @@ export function ProductImage({ product, priority = false }: ProductImageProps) {
       )}
 
       <Image
-        src={product.image || "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80"}
+        src={imageUrl}
         alt={product.name}
         width={300}
         height={300}
         unoptimized
         loading={priority ? "eager" : "lazy"}
-        className="object-cover"
         style={{
           width: "100%",
           height: "100%",
+          objectFit: "contain",
           padding: "12px",
           boxSizing: "border-box",
           display: "block",
@@ -67,7 +69,7 @@ export function ProductImage({ product, priority = false }: ProductImageProps) {
         onLoad={() => setLoaded(true)}
         onError={(e) => {
           const img = e.currentTarget as HTMLImageElement;
-          img.src = "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80";
+          img.src = `https://tse3.mm.bing.net/th?q=${encodeURIComponent(`${product.brand} ${product.name} product`)}&w=420&h=420&c=7&rs=1&p=0&o=5&pid=1.7`;
         }}
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLElement).style.transform = "scale(1.05)";

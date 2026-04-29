@@ -5,5 +5,7 @@ export function getCategoryImage(name: string): string {
     (k) => k.toLowerCase() === name.toLowerCase()
   );
 
-  return key ? categoryImages[key] : "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80";
+  if (key) return categoryImages[key];
+
+  return `https://tse4.mm.bing.net/th?q=${encodeURIComponent(`${name} grocery products`)}&w=520&h=360&c=7&rs=1&p=0&o=5&pid=1.7`;
 }

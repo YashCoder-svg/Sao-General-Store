@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Product, PRODUCTS } from "@/lib/products";
+import { getCategoryFilterIds, getCategoryLabel } from "@/lib/categoryFilters";
 
 function SkeletonCard() {
   return (
@@ -37,9 +38,10 @@ export function ProductGrid({ category, searchQuery = "" }: { category: string, 
       if (active) setLoading(true);
     });
     const t = setTimeout(() => {
-      let nextProducts = category === "all" 
-        ? PRODUCTS 
-        : PRODUCTS.filter(p => p.category === category);
+      const filterIds = getCategoryFilterIds(category);
+      let nextProducts = category === "all"
+        ? PRODUCTS
+        : PRODUCTS.filter(p => filterIds.includes(p.category));
 
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -85,13 +87,7 @@ export function ProductGrid({ category, searchQuery = "" }: { category: string, 
     return () => observer.disconnect();
   }, [products]);
 
-  const catLabel =
-    category === "all"
-      ? "All Products"
-      : category
-          .split("-")
-          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(" & ");
+  const catLabel = getCategoryLabel(category);
 
   return (
     <section style={{ padding: "64px 0" }}>

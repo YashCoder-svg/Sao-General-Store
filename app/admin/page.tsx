@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   LayoutDashboard, Package, ShoppingBag, Plus, X,
@@ -8,16 +8,68 @@ import {
   Edit, Eye, EyeOff, Star
 } from "lucide-react";
 import { PRODUCTS, CATEGORIES, Product } from "@/lib/products";
+import {
+  loadStoredOrders,
+  subscribeToStoreOrders,
+  updateStoredOrderStatus,
+  type OrderStatus,
+  type StoreOrder,
+} from "@/lib/orders";
 
-type OrderStatus = "Pending" | "Confirmed" | "Delivered" | "Cancelled";
+const MOCK_ORDER_DATE = new Date().toLocaleDateString("en-IN", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
 
-const MOCK_ORDERS = [
-  { id: "KM291847", customer: "Ravi Kumar", items: 3, total: 1249, status: "Delivered" as OrderStatus, time: "2:14 PM" },
-  { id: "KM384920", customer: "Priya Sharma", items: 1, total: 399, status: "Confirmed" as OrderStatus, time: "2:31 PM" },
-  { id: "KM102938", customer: "Suresh Reddy", items: 5, total: 892, status: "Pending" as OrderStatus, time: "2:55 PM" },
-  { id: "KM847261", customer: "Lalitha Devi", items: 2, total: 318, status: "Pending" as OrderStatus, time: "3:02 PM" },
-  { id: "KM019283", customer: "Arjun Varma", items: 4, total: 1650, status: "Cancelled" as OrderStatus, time: "1:45 PM" },
+const MOCK_ORDERS: StoreOrder[] = [
+  { id: "KM291847", customer: "Ravi Kumar", mobile: "", address: "", city: "Raigarh", pincode: "", items: 3, total: 1249, status: "Delivered", date: MOCK_ORDER_DATE, time: "2:14 PM", deliverySlot: "Express (30 min)", paymentMethod: "upi", products: [] },
+  { id: "KM384920", customer: "Priya Sharma", mobile: "", address: "", city: "Raigarh", pincode: "", items: 1, total: 399, status: "Confirmed", date: MOCK_ORDER_DATE, time: "2:31 PM", deliverySlot: "Express (30 min)", paymentMethod: "card", products: [] },
+  { id: "KM102938", customer: "Suresh Reddy", mobile: "", address: "", city: "Raigarh", pincode: "", items: 5, total: 892, status: "Pending", date: MOCK_ORDER_DATE, time: "2:55 PM", deliverySlot: "Today 6-8 PM", paymentMethod: "cod", products: [] },
+  { id: "KM847261", customer: "Lalitha Devi", mobile: "", address: "", city: "Raigarh", pincode: "", items: 2, total: 318, status: "Pending", date: MOCK_ORDER_DATE, time: "3:02 PM", deliverySlot: "Today 8-10 PM", paymentMethod: "upi", products: [] },
+  { id: "KM019283", customer: "Arjun Varma", mobile: "", address: "", city: "Raigarh", pincode: "", items: 4, total: 1650, status: "Cancelled", date: MOCK_ORDER_DATE, time: "1:45 PM", deliverySlot: "Tomorrow 7-9 AM", paymentMethod: "netbanking", products: [] },
 ];
+
+function mergeOrders(...orderGroups: StoreOrder[][]) {
+  const byId = new Map<string, StoreOrder>();
+  orderGroups.flat().forEach((order) => byId.set(order.id, order));
+  return Array.from(byId.values());
+}
+
+function formatOrderDate(date: Date) {
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function getOrderDate(order: StoreOrder) {
+  if (order.date) return order.date;
+
+  const createdAt = order.createdAt;
+
+  if (createdAt instanceof Date) return formatOrderDate(createdAt);
+
+  if (typeof createdAt === "string") {
+    const parsedDate = new Date(createdAt);
+    if (!Number.isNaN(parsedDate.getTime())) return formatOrderDate(parsedDate);
+  }
+
+  if (createdAt && typeof createdAt === "object" && createdAt.toDate) {
+    return formatOrderDate(createdAt.toDate());
+  }
+
+  if (createdAt && typeof createdAt === "object" && createdAt.seconds) {
+    return formatOrderDate(new Date(createdAt.seconds * 1000));
+  }
+
+  return MOCK_ORDER_DATE;
+}
+
+function formatOrderDateTime(order: StoreOrder) {
+  return `${getOrderDate(order)}, ${order.time}`;
+}
 
 const STATUS_STYLES: Record<OrderStatus, { bg: string; color: string; icon: typeof CheckCircle2 }> = {
   Delivered: { bg: "#D8F3DC", color: "#2D6A4F", icon: CheckCircle2 },
@@ -83,8 +135,32 @@ export default function AdminPage() {
   const hasPreviewInput = Boolean(newProduct.image);
   const previewImage = newProduct.image;
 
-  const todayRevenue = MOCK_ORDERS.filter(o => o.status !== "Cancelled").reduce((a, o) => a + o.total, 0);
-  const pendingCount = MOCK_ORDERS.filter(o => o.status === "Pending").length;
+  useEffect(() => {
+    const refreshOrders = () => {
+      setOrders(mergeOrders(loadStoredOrders(), MOCK_ORDERS));
+    };
+
+    refreshOrders();
+    const unsubscribe = subscribeToStoreOrders(
+      (remoteOrders) => {
+        setOrders(mergeOrders(remoteOrders, loadStoredOrders(), MOCK_ORDERS));
+      },
+      () => {
+        refreshOrders();
+      }
+    );
+
+    window.addEventListener("storage", refreshOrders);
+    window.addEventListener("kirana-orders-updated", refreshOrders);
+    return () => {
+      unsubscribe();
+      window.removeEventListener("storage", refreshOrders);
+      window.removeEventListener("kirana-orders-updated", refreshOrders);
+    };
+  }, []);
+
+  const todayRevenue = orders.filter(o => o.status !== "Cancelled").reduce((a, o) => a + o.total, 0);
+  const pendingCount = orders.filter(o => o.status === "Pending").length;
   const lowStock = products.filter(p => p.inStock === false).length;
 
   const handleAddProduct = () => {
@@ -119,6 +195,7 @@ export default function AdminPage() {
 
   const updateOrderStatus = (id: string, status: OrderStatus) => {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+    updateStoredOrderStatus(id, status);
   };
 
   const inputStyle = {
@@ -187,7 +264,7 @@ export default function AdminPage() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px", marginBottom: "32px" }}>
                 {[
                   { label: "Today's Revenue", value: `₹${todayRevenue.toLocaleString()}`, icon: TrendingUp, color: "#2D6A4F", bg: "#D8F3DC" },
-                  { label: "Total Orders", value: MOCK_ORDERS.length, icon: ShoppingBag, color: "#2563EB", bg: "#DBEAFE" },
+                  { label: "Total Orders", value: orders.length, icon: ShoppingBag, color: "#2563EB", bg: "#DBEAFE" },
                   { label: "Pending Orders", value: pendingCount, icon: Clock, color: "#D97706", bg: "#FEF3C7" },
                   { label: "Low Stock Items", value: lowStock, icon: AlertTriangle, color: "#DC2626", bg: "#FEE2E2" },
                   { label: "Total Products", value: products.length, icon: Package, color: "#7C3AED", bg: "#EDE9FE" },
@@ -218,7 +295,7 @@ export default function AdminPage() {
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
                     <tr style={{ background: "#FAFAF7" }}>
-                      {["Order ID", "Customer", "Items", "Total", "Status", "Time"].map(h => (
+                      {["Order ID", "Customer", "Items", "Total", "Status", "Date & Time"].map(h => (
                         <th key={h} style={{ padding: "11px 16px", textAlign: "left" as const, fontSize: "12px", fontWeight: 700, color: "#6b7280", textTransform: "uppercase" as const, letterSpacing: "0.07em" }}>{h}</th>
                       ))}
                     </tr>
@@ -238,7 +315,7 @@ export default function AdminPage() {
                               <StatusIcon size={11} /> {o.status}
                             </span>
                           </td>
-                          <td style={{ padding: "13px 16px", fontSize: "13px", color: "#6b7280" }}>{o.time}</td>
+                          <td style={{ padding: "13px 16px", fontSize: "13px", color: "#6b7280" }}>{formatOrderDateTime(o)}</td>
                         </tr>
                       );
                     })}
@@ -492,7 +569,7 @@ export default function AdminPage() {
                           <p style={{ fontFamily: "Cabinet Grotesk, sans-serif", fontWeight: 800, fontSize: "15px", color: "#0a0a0a" }}>
                             #{o.id}
                           </p>
-                          <p style={{ fontSize: "13px", color: "#6b7280" }}>{o.customer} · {o.items} items · {o.time}</p>
+                          <p style={{ fontSize: "13px", color: "#6b7280" }}>{o.customer} · {o.items} items · {formatOrderDateTime(o)}</p>
                         </div>
                       </div>
 

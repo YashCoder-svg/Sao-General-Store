@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { X, Plus, Minus, Trash2, ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/lib/store";
+import { getProductImageUrl } from "@/lib/productImageUrl";
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, updateQty, subtotal } = useCartStore();
@@ -195,7 +196,7 @@ export function CartDrawer() {
                     }}
                   >
                     <Image
-                      src={item.image}
+                      src={getProductImageUrl(item)}
                       alt={item.name}
                       fill
                       unoptimized

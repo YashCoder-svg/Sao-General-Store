@@ -7,6 +7,7 @@ import { ShoppingCart, User, Search, ChevronDown, X, Phone, Mail, Lock, LogOut }
 import { useCartStore } from "@/lib/store";
 import { useAuth } from "@/lib/authContext";
 import { CATEGORIES, PRODUCTS } from "@/lib/products";
+import { getProductImageUrl } from "@/lib/productImageUrl";
 
 export function Header({ activeCategory, onCategoryChange, searchQuery = "", onSearchChange = () => {} }: {
   activeCategory?: string;
@@ -233,7 +234,7 @@ export function Header({ activeCategory, onCategoryChange, searchQuery = "", onS
                     onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                   >
                     <div style={{ width: "32px", height: "32px", position: "relative", borderRadius: "4px", overflow: "hidden", background: "#f5f5f5" }}>
-                      <Image src={p.image} alt={p.name} fill style={{ objectFit: "contain" }} />
+                      <Image src={getProductImageUrl(p)} alt={p.name} fill unoptimized style={{ objectFit: "contain" }} />
                     </div>
                     <div>
                       <div style={{ fontSize: "13px", fontWeight: 600, color: "#1a1a1a" }}>{p.name}</div>

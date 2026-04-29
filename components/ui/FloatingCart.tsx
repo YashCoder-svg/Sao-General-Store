@@ -5,7 +5,7 @@ import { ShoppingBag, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function FloatingCart() {
-  const { items, subtotal } = useCartStore();
+  const { items, subtotal, openCart } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [isBouncing, setIsBouncing] = useState(false);
 
@@ -39,7 +39,7 @@ export function FloatingCart() {
       }}
     >
       <button
-        onClick={() => window.dispatchEvent(new CustomEvent("open-cart"))}
+        onClick={openCart}
         style={{
           width: "100%",
           background: "#2D6A4F",
@@ -57,11 +57,11 @@ export function FloatingCart() {
         }}
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLElement).style.background = "#1b4332";
-          (e.currentTarget as HTMLElement).style.transform = "translateX(-50%) scale(1.02)";
+          (e.currentTarget as HTMLElement).style.transform = "scale(1.02)";
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLElement).style.background = "#2D6A4F";
-          (e.currentTarget as HTMLElement).style.transform = "translateX(-50%) scale(1)";
+          (e.currentTarget as HTMLElement).style.transform = "scale(1)";
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
