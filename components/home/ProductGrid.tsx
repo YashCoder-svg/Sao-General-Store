@@ -1,72 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import { ProductCard } from "@/components/product/ProductCard";
-import { Product, PRODUCTS } from "@/lib/products";
+import { PRODUCTS } from "@/lib/products";
 import { getCategoryFilterIds, getCategoryLabel } from "@/lib/categoryFilters";
 
-function SkeletonCard() {
-  return (
-    <div
-      style={{
-        background: "white",
-        borderRadius: "20px",
-        border: "1px solid #E8E4DC",
-        overflow: "hidden",
-      }}
-    >
-      <div className="skeleton" style={{ height: "190px" }} />
-      <div style={{ padding: "14px" }}>
-        <div className="skeleton" style={{ height: "12px", width: "40%", marginBottom: "8px" }} />
-        <div className="skeleton" style={{ height: "16px", width: "85%", marginBottom: "4px" }} />
-        <div className="skeleton" style={{ height: "16px", width: "65%", marginBottom: "12px" }} />
-        <div className="skeleton" style={{ height: "32px", borderRadius: "10px" }} />
-      </div>
-    </div>
-  );
-}
-
 export function ProductGrid({ category, searchQuery = "" }: { category: string, searchQuery?: string }) {
-  const [loading, setLoading] = useState(true);
-  const [products, setProducts] = useState<Product[]>([]);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    let active = true;
-    const frame = requestAnimationFrame(() => {
-      if (active) setLoading(true);
-    });
-    const t = setTimeout(() => {
-      const filterIds = getCategoryFilterIds(category);
-      let nextProducts = category === "all"
-        ? PRODUCTS
-        : PRODUCTS.filter(p => filterIds.includes(p.category));
+  const products = useMemo(() => {
+    const filterIds = getCategoryFilterIds(category);
+    let nextProducts = category === "all"
+      ? PRODUCTS
+      : PRODUCTS.filter((p) => filterIds.includes(p.category));
 
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        nextProducts = nextProducts.filter(p => 
-          p.name.toLowerCase().includes(query) ||
-          p.brand.toLowerCase().includes(query) ||
-          p.category.toLowerCase().includes(query)
-        );
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      nextProducts = nextProducts.filter((p) =>
+        p.name.toLowerCase().includes(query) ||
+        p.brand.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query)
+      );
+    }
+
+    return [...nextProducts].sort((a, b) => {
+      if (b.rating !== a.rating) {
+        return b.rating - a.rating;
       }
-
-      nextProducts = [...nextProducts].sort((a, b) => {
-        if (b.rating !== a.rating) {
-          return b.rating - a.rating;
-        }
-        return a.name.localeCompare(b.name);
-      });
-
-      setProducts(nextProducts);
-      setLoading(false);
-    }, 600);
-    return () => {
-      active = false;
-      cancelAnimationFrame(frame);
-      clearTimeout(t);
-    };
+      return a.name.localeCompare(b.name);
+    });
   }, [category, searchQuery]);
 
   // Scroll reveal via IntersectionObserver
@@ -112,7 +75,7 @@ export function ProductGrid({ category, searchQuery = "" }: { category: string, 
                 fontFamily: "Satoshi, sans-serif",
               }}
             >
-              {loading ? "Loading..." : `${products.length} items`}
+              {`${products.length} items`}
             </span>
             <h2
               className="font-display"
@@ -159,7 +122,7 @@ export function ProductGrid({ category, searchQuery = "" }: { category: string, 
         </div>
 
         {/* Grid */}
-        {products.length === 0 && !loading ? (
+        {products.length === 0 ? (
           <div style={{ textAlign: "center", padding: "80px 0", background: "white", borderRadius: "20px", border: "1px dashed #E8E4DC" }}>
             <div style={{ fontSize: "40px", marginBottom: "16px" }}>🔍</div>
             <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#1a1a1a" }}>No products found</h3>
@@ -176,19 +139,15 @@ export function ProductGrid({ category, searchQuery = "" }: { category: string, 
               gap: "18px",
             }}
           >
-            {loading
-              ? Array.from({ length: 8 }).map((_, i) => (
-                  <SkeletonCard key={i} />
-                ))
-              : products.map((product, i) => (
-                  <div
-                    key={product.id}
-                    className="reveal"
-                    style={{ transitionDelay: `${Math.min(i * 0.05, 0.4)}s` }}
-                  >
-                    <ProductCard product={product} />
-                  </div>
-                ))}
+            {products.map((product, i) => (
+              <div
+                key={product.id}
+                className="reveal"
+                style={{ transitionDelay: `${Math.min(i * 0.05, 0.4)}s` }}
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
           </div>
         )}
       </div>
